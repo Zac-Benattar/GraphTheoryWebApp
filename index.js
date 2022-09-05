@@ -129,8 +129,8 @@ addEventListener('mousedown', (event) => {
     
         // determining if an object has been clicked on, with small extra margin
         for (const element of objects) {
-            const xdif = event.clientX - element.x - vertexRadius
-            const ydif = event.clientY - element.y - vertexRadius
+            const xdif = event.clientX - element.x
+            const ydif = event.clientY - element.y
 
             if (Math.sqrt(Math.pow(xdif, 2) + Math.pow(ydif, 2)) < vertexRadius + 2) {
     
@@ -187,7 +187,7 @@ addEventListener('mouseup', (event) => {
 
         // if no object was clicked on and no drag action performed then we create a new node
         if (!dragInAction && !dragSelectInAction) {
-            const vert = new Vertex(event.clientX - vertexRadius, event.clientY, vertexRadius, 'green', 'red')
+            const vert = new Vertex(event.clientX - vertexRadius / 2, event.clientY - vertexRadius / 2, vertexRadius, 'green', 'red')
             vert.isSelected = true
             selectedObjects.push(vert)
             objects.push(vert)
