@@ -77,7 +77,7 @@ class Vertex {
         this.arcs = [];
     }
 
-    closestPointOnCircleToGivenPoint(x, y) {
+    closestPointOnVertexToGivenPoint(x, y) {
         var dx = x - this.x;
         var dy = y - this.y;
         var scale = Math.sqrt(dx * dx + dy * dy);
@@ -131,7 +131,7 @@ class Edge {
     }
 
     draw() {
-        /* Draws a line between the locations of the parents of the arc */
+        /* Draws a line between the parents of the arc */
         c.strokeStyle = 'black';
         c.lineWidth = 5;
 
@@ -149,6 +149,7 @@ class Edge {
     }
 }
 
+// Returns the object at a specified point, null if none there
 function selectObject(x, y) {
     for (const element of objects) {
         if (element.containsPoint(x, y)) {
@@ -159,6 +160,7 @@ function selectObject(x, y) {
     return null;
 }
 
+// Set of stolen functions to try to make relative mouse positions work in the canvas, doesnt work at time of implementation/theft
 function crossBrowserElementPos(e) {
     e = e || window.event;
     var obj = e.target || e.srcElement;
@@ -205,7 +207,7 @@ canvas.ondblclick = function (e) {
 canvas.onmousedown = function (e) {
     if (e.button == 0) {
         // Getting mouse position and the object under it
-        primaryMouseButtonDown = true
+        primaryMouseButtonDown = true;
         var mousePos = crossBrowserRelativeMousePos(e);
         mouseDownX = mousePos.x;
         mouseDownY = mousePos.y;
@@ -242,9 +244,9 @@ canvas.onmousedown = function (e) {
         // Deselecting all objects if ctrl not held
         if (!ctrlHeld) {
             for (const element of selectedObjects) {
-                element.isSelected = false
+                element.isSelected = false;
             }
-            selectedObjects.length = 0
+            selectedObjects.length = 0;
         }
 
         if (selectedObject != null) {
@@ -271,11 +273,10 @@ canvas.onmouseup = function (e) {
     }
 }
 
+// Handles moving of objects and computing drag selects
 canvas.onmousemove = function (e) {
 
     var mousePos = crossBrowserRelativeMousePos(e);
-
-
 
     // Calculating the distance the mouse has travelled since the previous mouse movement
     prevMouseX = mouseX;
@@ -323,11 +324,11 @@ canvas.onmousemove = function (e) {
 addEventListener('keydown', (e) => {
     // Shift is used to draw edges from selected nodes
     if (e.code == 'ShiftLeft') {
-        shiftHeld = true
+        shiftHeld = true;
     }
     // Ctrl is used for multi select
     else if (e.code == 'ControlLeft') {
-        ctrlHeld = true
+        ctrlHeld = true;
     }
 
 })
