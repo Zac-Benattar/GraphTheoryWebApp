@@ -71,6 +71,20 @@ class Vertex {
         this.arcs = []
     }
 
+    closestPointOnCircleToGivenPoint(x, y) {
+        var dx = x - this.x;
+        var dy = y - this.y;
+        var scale = Math.sqrt(dx * dx + dy * dy);
+        return {
+            'x': this.x + dx * this.radius / scale,
+            'y': this.y + dy * this.radius / scale,
+        };
+    }
+
+    containsPoint(x, y) {
+        return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < nodeRadius * nodeRadius;
+    }
+
     draw() {
         c.beginPath()
         c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
@@ -88,7 +102,7 @@ class Vertex {
     }
 }
 
-class Arc {
+class Edge {
     constructor(vertex1, vertex2, colour, selectedColour) {
         this.id = Math.floor(Math.random() * 100)
         this.vertex1 = vertex1
@@ -140,7 +154,7 @@ addEventListener('mousedown', (event) => {
                         if (selectedObjects[j] instanceof Vertex) {
     
                             // create a new arc between vertices
-                            let arc = new Arc(selectedObjects[j], element, 'black', 'red')
+                            let arc = new Edge(selectedObjects[j], element, 'black', 'red')
 
                             // add the arc to the vertices list of arcs
                             selectedObjects[j].arcs.push(arc)
@@ -257,7 +271,7 @@ addEventListener('keyup', (event) => {
     else if (event.code == 'ControlLeft') {
         ctrlHeld = false
     }
-    else if (event.code == 'Backspace') {
+    else if (event.code == 'Delete') {
 
         // deleting all selected objects
         for (let i = 0; i < objects.length; i++) {
@@ -272,7 +286,7 @@ addEventListener('keyup', (event) => {
             }
 
             // deleting arc if it is selected or if either of its vertices are selected
-            if (objects[i] instanceof Arc && (objects[i].isSelected || objects[i].vertex1.isSelected || objects[i].vertex2.isSelected)) {
+            if (objects[i] instanceof Edge && (objects[i].isSelected || objects[i].vertex1.isSelected || objects[i].vertex2.isSelected)) {
                 objects.splice(i, 1)
                 i--
             }  

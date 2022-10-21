@@ -1,5 +1,4 @@
-
-
+/* Default (Light Mode) style */
 body {
 	text-align: center;
     color:#121212;
@@ -8,41 +7,33 @@ body {
 	font: 14px/18px 'Verdana', 'Segoe UI', sans-serif;
 }
 
-/* Dark Mode styles */
-body.dark-theme {
-    color: #eee;
-    background: #121212;
-}
-
-h1 {
-	font: bold italic 50px Georgia, serif;
-}
-
 canvas {
 	display: block;
-	max-width: 1200px;
+	max-width: 1800px;
 	background: white;
 	border-radius: 20px;
 	-moz-border-radius: 20px;
 	margin: 10px auto;
 }
 
-canvas.dark-theme {
-    background: #252525;
+h1 {
+	font: bold italic 50px Georgia, serif;
 }
 
 a {
 	color: black;
 }
 
-a.dark-mode {
-    color: rgb(196, 196, 196)
-}
-
 div {
 	margin: 30px auto;
 	text-align: left;
 	max-width: 800px;
+}
+
+div.minidiv {
+    margin: 0px auto;
+    text-align: left;
+    max-width: 200px;
 }
 
 .error {
@@ -69,47 +60,84 @@ textarea {
 	margin: 0 auto;
 }
 
-label {
-    width:45px;
-    height:20px;
+ /* The switch - the box around the slider */
+ .switch {
     position: relative;
-    display: block;
-    background: #ebebeb;
-    border-radius: 20px;
-    box-shadow: inset 0px 5px 15px rgba(0,0,0,0.4), inset 0px -5px 15px rgba(255,255,255,0.4);
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-label:after {
-    content: "";
-    width:18px;
-    height: 18px;
-    position: absolute;
-    top:1px;
-    left:1px;
-    background: linear-gradient(180deg,#d6d6d6,#4e4e4e);
-    border-radius: 18px;
-    box-shadow: 0px 5px 10px rgba(0,0,0,0.2);
-    transition: 0.2s;
-}
-
-input {
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+  }
+  
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
     width: 0;
     height: 0;
-    visibility: hidden;
+  }
+  
+  /* The slider */
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .3s;
+    transition: .3s;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 22px;
+    width: 22px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .3s;
+    transition: .3s;
+  }
+  
+  input:checked + .slider {
+    background-color: #3b3b3b;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(22px);
+    -ms-transform: translateX(22px);
+    transform: translateX(22px);
+  }
+  
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 26px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  } 
+
+/* Dark Mode style */
+body.dark-theme {
+    color: #eee;
+    background: #121212;
 }
 
-input:checked + label {
-    background:#242424;
+body.dark-theme canvas{
+    color: #eee;
+    background: #252525;
 }
 
-input:checked + label:after {
-    left:43px;
-    transform: translateX(-100%);
-    background: linear-gradient(180deg,#777,#3a3a3a);
+body.dark-theme h1 {
+	font: bold italic 50px Georgia, serif;
 }
 
-label:active:after{ 
-    width: 26px; 
+body.dark-theme a {
+    color: rgb(196, 196, 196)
 }
