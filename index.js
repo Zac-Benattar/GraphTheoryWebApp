@@ -1,24 +1,24 @@
-// setup canvas
+// Setup canvas
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 canvas.width = innerWidth
 canvas.height = innerHeight
 
-// holds all objects and all selected objects in canvas
+// Holds all objects and all selected objects in canvas
 const objects = []
 const selectedObjects = []
 
-// holds the arc lines that are generated when shift is held
+// Holds the arc lines that are generated when shift is held
 const tempArcLines = []
 
-// state booleans
+// State booleans
 let primaryMouseButtonDown = false
 let dragSelectInAction = false
 let shiftHeld = false
 let ctrlHeld = false
 let dragInAction = false
 
-// location variables for mouse related properties
+// Location variables for mouse related properties
 let mouseX = 0
 let mouseY = 0
 let prevMouseX = 0
@@ -26,10 +26,10 @@ let prevMouseY = 0
 let mouseDownX = 0
 let mouseDownY = 0
 
-// visual adjustments
+// Visual adjustments, eventually user should be able to adjust
 let vertexRadius = 13
 
-// handles drawing frames, in an infinite loop
+// Handles drawing frames, in an infinite loop
 function animate() {
     requestAnimationFrame(animate)
     c.clearRect(0, 0, canvas.width, canvas.height)
@@ -37,11 +37,13 @@ function animate() {
         object.update()
     })
 
+    // Draws potential arcs (lines from all selected vertices)
     if (shiftHeld) {
+        // !!!! ADD CHECK FOR ELEMENT TO BE A VERTEX !!!!
         for (const element of selectedObjects) {
             c.strokeStyle = 'black'
             c.lineWidth = 5
-            
+
             c.beginPath()
             c.moveTo(element.x, element.y)
             c.lineTo(mouseX, mouseY)
@@ -52,13 +54,16 @@ function animate() {
     if (dragSelectInAction) {
         c.strokeStyle = 'black'
         c.lineWidth = 1
-        
+
         c.beginPath()
         c.rect(mouseDownX, mouseDownY, mouseX - mouseDownX, mouseY - mouseDownY)
         c.stroke()
     }
 }
 
+/* Vertices are one half of a graph. The location variables (x and y) are the at the 
+centre of the vertex. Each vertex holds a list of its arcs so its neighbours can be 
+easily traversed */
 class Vertex {
     constructor(x, y, radius, colour, selectedColour) {
         this.id = Math.floor(Math.random() * 100)
@@ -86,6 +91,8 @@ class Vertex {
     }
 
     draw() {
+        /* Draws an arc of angle 2pi (circle) and fills it with the colour specified by 
+        whether the vertex is selected or not */
         c.beginPath()
         c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
         if (this.isSelected) {
@@ -113,9 +120,10 @@ class Edge {
     }
 
     draw() {
+        /* Draws a line between the locations of the parents of the arc */
         c.strokeStyle = 'black'
         c.lineWidth = 5
-        
+
         c.beginPath()
         c.moveTo(this.vertex1.x, this.vertex1.y)
         c.lineTo(this.vertex2.x, this.vertex2.y)
@@ -140,15 +148,15 @@ addEventListener('mousedown', (event) => {
         let selectedObject = null
         mouseDownX = event.clientX
         mouseDownY = event.clientY
-    
-        // determining if an object has been clicked on, with small extra margin
+
+        // Determining if an object has been clicked on, with small extra margin
         for (const element of objects) {
             const xdif = event.clientX - element.x
             const ydif = event.clientY - element.y
 
             if (Math.sqrt(Math.pow(xdif, 2) + Math.pow(ydif, 2)) < vertexRadius + 2) {
-    
-                // if shift is held when a vertex is clicked we must add an arc between it and all selected vertices
+
+                // If shift is held when a vertex is clicked we must add an arc between it and all selected vertices
                 if (shiftHeld) {
                     for (let j = 0; j < selectedObjects.length; j++) {
                         if (selectedObjects[j] instanceof Vertex) {
@@ -156,34 +164,36 @@ addEventListener('mousedown', (event) => {
                             // create a new arc between vertices
                             let arc = new Edge(selectedObjects[j], element, 'black', 'red')
 
-                            // add the arc to the vertices list of arcs
+                            // Add the arc to the vertices list of arcs
                             selectedObjects[j].arcs.push(arc)
                             element.arcs.push(arc)
-    
-                            // push arc to objects array so it is persistant and drawn
+
+                            // Push arc to objects array so it is persistant and drawn
                             objects.push(arc)
                         }
                     }
                 }
-    
-                // selecting the object we clicked on, add it to the selected array if its not already there
+
+                // Selecting the object we clicked on, add it to the selected array if its not already there
                 if (!element.isSelected) {
                     element.isSelected = true
                     selectedObjects.push(element)
                 }
                 selectedObject = element
                 dragInAction = true
-    
+
                 break
             }
         }
-    
+
         if (!ctrlHeld) {
-            // deselecting all objects bar the one possibly just clicked on 
+            // Deselecting all objects bar the one possibly just clicked on 
             for (const element of selectedObjects) {
                 element.isSelected = false
             }
             selectedObjects.length = 0
+
+            // Selecting the object clicked on (if one was clicked on)
             if (selectedObject != null) {
                 selectedObject.isSelected = true
                 selectedObjects.push(selectedObject)
@@ -196,10 +206,11 @@ addEventListener('mousedown', (event) => {
 
 addEventListener('mouseup', (event) => {
 
+    // Determine if mouse1 has been lifted
     if (event.button == 0) {
         primaryMouseButtonDown = false
 
-        // if no object was clicked on and no drag action performed then we create a new node
+        // If no object was clicked on and no drag action performed then we create a new node
         if (!dragInAction && !dragSelectInAction) {
             const vert = new Vertex(event.clientX - vertexRadius / 2, event.clientY - vertexRadius / 2, vertexRadius, 'green', 'red')
             vert.isSelected = true
@@ -214,7 +225,7 @@ addEventListener('mouseup', (event) => {
 
 addEventListener('mousemove', (event) => {
 
-    // calculating the distance the mouse has travelled since the previous mouse movement
+    // Calculating the distance the mouse has travelled since the previous mouse movement
     prevMouseX = mouseX
     prevMouseY = mouseY
     mouseX = event.clientX
@@ -222,26 +233,30 @@ addEventListener('mousemove', (event) => {
     const xdif = event.clientX - prevMouseX
     const ydif = event.clientY - prevMouseY
 
-    // moving each selected object
+    // Moving each selected object
     if (dragInAction) {
         for (const element of selectedObjects) {
             element.x = element.x + xdif
             element.y = element.y + ydif
         }
     }
+    /* If the user is not dragging objects then they are performing a drag select,
+    hence we draw a rectange (in animate()) and here select all objects within */
     else if (primaryMouseButtonDown) {
         dragSelectInAction = true
+        // Loop through all objects to determine if selected, probably a fast way of doing this
         for (const element of objects) {
+            // Selected objects in rectangle
             if (isInside(element.x, element.y, mouseDownX, mouseDownY, mouseX, mouseY)) {
                 element.isSelected = true
                 selectedObjects.push(element)
             }
+            // De-selected objects outside of the rectange if ctrl not held
             else if (!ctrlHeld) {
                 if (element.isSelected) {
                     element.isSelected = false
                     for (let j = 0; j < selectedObjects.length; j++) {
-                        if (selectedObjects[j] == element)
-                        {
+                        if (selectedObjects[j] == element) {
                             selectedObjects.splice(j, 1)
                             break
                         }
@@ -253,11 +268,11 @@ addEventListener('mousemove', (event) => {
 })
 
 addEventListener('keydown', (event) => {
-    // shift is used to draw arcs from selected nodes
+    // Shift is used to draw arcs from selected nodes
     if (event.code == 'ShiftLeft') {
         shiftHeld = true
     }
-    // ctrl is used for multi select
+    // Ctrl is used for multi select
     else if (event.code == 'ControlLeft') {
         ctrlHeld = true
     }
@@ -265,20 +280,22 @@ addEventListener('keydown', (event) => {
 })
 
 addEventListener('keyup', (event) => {
+    // Shift allows the creation of arcs
     if (event.code == 'ShiftLeft') {
         shiftHeld = false
     }
+    // Ctrl allows multi selection
     else if (event.code == 'ControlLeft') {
         ctrlHeld = false
     }
     else if (event.code == 'Delete') {
 
-        // deleting all selected objects
+        // Deleting all selected objects
         for (let i = 0; i < objects.length; i++) {
 
             if (objects[i].isSelected) {
 
-                // deleting selected vertices
+                // Deleting selected vertices
                 if (objects[i] instanceof Vertex) {
                     objects.splice(i, 1)
                     i--
@@ -289,10 +306,10 @@ addEventListener('keyup', (event) => {
             if (objects[i] instanceof Edge && (objects[i].isSelected || objects[i].vertex1.isSelected || objects[i].vertex2.isSelected)) {
                 objects.splice(i, 1)
                 i--
-            }  
+            }
         }
 
-        // clearing selected objects so no instances of deleted objects remain
+        // Clearing selected objects so no instances of deleted objects remain
         while (selectedObjects.length > 0) {
             selectedObjects.pop()
         }
@@ -300,14 +317,16 @@ addEventListener('keyup', (event) => {
 
 })
 
+// Determines if a point (x,y) is within a rectangle (z1, z2, z3, z4)
 function isInside(x, y, z1, z2, z3, z4) {
     let x1 = Math.min(z1, z3)
     let x2 = Math.max(z1, z3)
     let y1 = Math.min(z2, z4)
     let y2 = Math.max(z2, z4)
-    return !!((x1 <= x ) && ( x <= x2) && (y1 <= y) && (y <= y2))
+    return !!((x1 <= x) && (x <= x2) && (y1 <= y) && (y <= y2))
 }
 
+// Called to initiate the animation loop
 animate()
 
 
