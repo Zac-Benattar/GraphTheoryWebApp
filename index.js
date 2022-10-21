@@ -1,41 +1,41 @@
 // Setup canvas
-const canvas = document.querySelector('canvas')
-const c = canvas.getContext('2d')
-canvas.width = innerWidth
-canvas.height = innerHeight
+const canvas = document.querySelector('canvas');
+const c = canvas.getContext('2d');
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 
 // Holds all objects and all selected objects in canvas
-const objects = []
-const selectedObjects = []
+const objects = [];
+const selectedObjects = [];
 
 // Holds the arc lines that are generated when shift is held
-const tempArcLines = []
+const tempArcLines = [];
 
 // State booleans
-let primaryMouseButtonDown = false
-let dragSelectInAction = false
-let shiftHeld = false
-let ctrlHeld = false
-let dragInAction = false
+let primaryMouseButtonDown = false;
+let dragSelectInAction = false;
+let shiftHeld = false;
+let ctrlHeld = false;
+let dragInAction = false;
 
 // Location variables for mouse related properties
-let mouseX = 0
-let mouseY = 0
-let prevMouseX = 0
-let prevMouseY = 0
-let mouseDownX = 0
-let mouseDownY = 0
+let mouseX = 0;
+let mouseY = 0;
+let prevMouseX = 0;
+let prevMouseY = 0;
+let mouseDownX = 0;
+let mouseDownY = 0;
 let clickedObjectPadding = 5;
 
 // Visual adjustments, eventually user should be able to adjust
-let vertexRadius = 13
+let vertexRadius = 13;
 
 // Handles drawing frames, in an infinite loop
 function animate() {
-    requestAnimationFrame(animate)
-    c.clearRect(0, 0, canvas.width, canvas.height)
+    requestAnimationFrame(animate);
+    c.clearRect(0, 0, canvas.width, canvas.height);
     objects.forEach((object) => {
-        object.update()
+        object.update();
     })
 
     // Draws potential arcs (lines from all selected vertices)
