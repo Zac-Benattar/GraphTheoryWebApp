@@ -41,23 +41,23 @@ function animate() {
     if (shiftHeld) {
         // !!!! ADD CHECK FOR ELEMENT TO BE A VERTEX !!!!
         for (const element of selectedObjects) {
-            c.strokeStyle = 'black'
-            c.lineWidth = 5
+            c.strokeStyle = 'black';
+            c.lineWidth = 5;
 
-            c.beginPath()
-            c.moveTo(element.x, element.y)
-            c.lineTo(mouseX, mouseY)
-            c.stroke()
+            c.beginPath();
+            c.moveTo(element.x, element.y);
+            c.lineTo(mouseX, mouseY);
+            c.stroke();
         }
     }
 
     if (dragSelectInAction) {
-        c.strokeStyle = 'black'
-        c.lineWidth = 1
+        c.strokeStyle = 'black';
+        c.lineWidth = 1;
 
-        c.beginPath()
-        c.rect(mouseDownX, mouseDownY, mouseX - mouseDownX, mouseY - mouseDownY)
-        c.stroke()
+        c.beginPath();
+        c.rect(mouseDownX, mouseDownY, mouseX - mouseDownX, mouseY - mouseDownY);
+        c.stroke();
     }
 }
 
@@ -65,15 +65,15 @@ function animate() {
 centre of the vertex. Each vertex holds a list of its arcs so its neighbours can be 
 easily traversed */
 class Vertex {
-    constructor(x, y, radius, colour, selectedColour) {
-        this.id = Math.floor(Math.random() * 100)
-        this.x = x
-        this.y = y
-        this.radius = radius
-        this.colour = colour
-        this.selectedColour = selectedColour
-        this.isSelected = false
-        this.arcs = []
+    constructor(x, y) {
+        this.id = Math.floor(Math.random() * 100);
+        this.x = x;
+        this.y = y;
+        this.radius = vertexRadius;
+        this.colour = 'green';
+        this.selectedColour = 'red';
+        this.isSelected = false;
+        this.arcs = [];
     }
 
     closestPointOnCircleToGivenPoint(x, y) {
@@ -93,30 +93,30 @@ class Vertex {
     draw() {
         /* Draws an arc of angle 2pi (circle) and fills it with the colour specified by 
         whether the vertex is selected or not */
-        c.beginPath()
-        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
         if (this.isSelected) {
-            c.fillStyle = this.selectedColour
+            c.fillStyle = this.selectedColour;
         }
         else {
-            c.fillStyle = this.colour
+            c.fillStyle = this.colour;
         }
-        c.fill()
+        c.fill();
     }
 
     update() {
-        this.draw()
+        this.draw();
     }
 }
 
 class Edge {
-    constructor(vertex1, vertex2, colour, selectedColour) {
-        this.id = Math.floor(Math.random() * 100)
-        this.vertex1 = vertex1
-        this.vertex2 = vertex2
-        this.colour = colour
-        this.selectedcolour = selectedColour
-        this.isSelected = false
+    constructor(vertex1, vertex2) {
+        this.id = Math.floor(Math.random() * 100);
+        this.vertex1 = vertex1;
+        this.vertex2 = vertex2;
+        this.colour = 'black';
+        this.selectedcolour = 'red';
+        this.isSelected = false;
     }
 
     // !!!! Implement this !!!!
@@ -191,7 +191,7 @@ canvas.ondblclick = function (e) {
     selectedObject = selectObject(mousePos.x, mousePos.y);
 
     if (selectedObject == null) {
-        selectedObject = new Vertex(mousePos.x, mousePos.y, vertexRadius, 'green', 'red');
+        selectedObject = new Vertex(mousePos.x, mousePos.y);
         selectedObject.isSelected = true;
         selectedObjects.push(selectedObject);
         objects.push(selectedObject);
@@ -201,12 +201,26 @@ canvas.ondblclick = function (e) {
 // Mouse down event - selects a vertex
 canvas.onmousedown = function (e) {
     if (e.button == 0) {
+        // Getting mouse position and the object under it
         primaryMouseButtonDown = true
-
         var mousePos = crossBrowserRelativeMousePos(e);
         mouseDownX = mousePos.x;
         mouseDownY = mousePos.y;
-        let selectedObject = selectObject(mousePos.x, mousePos.y);
+        var selectedObject = selectObject(mousePos.x, mousePos.y);
+
+        // Holds whether clicked object is already selected - janky way to make deselecting all other objects easier/faster
+        var isAlreadySelected = false;
+        if (selectedObject != null) {
+            isAlreadySelected = selectedObject.isSelected;
+        }
+
+        if (!ctrlHeld) {
+            // Deselecting all objects if ctrl not held
+            for (const element of selectedObjects) {
+                element.isSelected = false
+            }
+            selectedObjects.length = 0
+        }
 
         if (selectedObject != null) {
             // If shift is held when a vertex is clicked we must add an arc between it and all selected vertices
@@ -214,41 +228,31 @@ canvas.onmousedown = function (e) {
                 for (let j = 0; j < selectedObjects.length; j++) {
                     if (selectedObjects[j] instanceof Vertex) {
 
-                        // Create a new arc between vertices
-                        let arc = new Edge(selectedObjects[j], element, 'black', 'red');
+                        // Create a new edge between vertices
+                        let edge = new Edge(selectedObject, selectedObjects[j]);
 
-                        // Add the arc to the vertices list of arcs
-                        selectedObjects[j].arcs.push(arc);
-                        element.arcs.push(arc);
+                        // Add the edge to the vertices list of arcs
+                        selectedObject.arcs.push(edge);
+                        selectedObjects[j].arcs.push(edge);
 
-                        // Push arc to objects array so it is persistant and drawn
-                        objects.push(arc);
+                        // Push edge to objects array so it is persistant and drawn
+                        objects.push(edge);
                     }
                 }
             }
 
-            // Ensuring the clicked on element is selected and in selected list
-            if (!selectedObject.isSelected) {
-                selectObject.isSelected = true;
+            // Toggle whether the clicked object is selected and in selected list
+            if (isAlreadySelected) {
+                selectedObject.isSelected = false;
+                selectedObjects.splice(selectedObjects.findIndex(p => p.id == selectedObject.id));
+            }
+            else {
+                selectedObject.isSelected = true;
                 selectedObjects.push(selectedObject);
             }
 
             // Begins a drag action
             dragInAction = true;
-        }
-
-        if (!ctrlHeld) {
-            // Deselecting all objects bar the one possibly just clicked on 
-            for (const element of selectedObjects) {
-                element.isSelected = false
-            }
-            selectedObjects.length = 0
-
-            // Re-selecting the object clicked on (if one was clicked on)
-            if (selectedObject != null) {
-                selectedObject.isSelected = true
-                selectedObjects.push(selectedObject)
-            }
         }
 
     }
@@ -266,7 +270,7 @@ canvas.onmouseup = function (e) {
 canvas.onmousemove = function (e) {
 
     var mousePos = crossBrowserRelativeMousePos(e);
-    
+
 
 
     // Calculating the distance the mouse has travelled since the previous mouse movement
@@ -313,7 +317,7 @@ canvas.onmousemove = function (e) {
 }
 
 addEventListener('keydown', (e) => {
-    // Shift is used to draw arcs from selected nodes
+    // Shift is used to draw edges from selected nodes
     if (e.code == 'ShiftLeft') {
         shiftHeld = true
     }
@@ -325,13 +329,13 @@ addEventListener('keydown', (e) => {
 })
 
 addEventListener('keyup', (e) => {
-    // Shift allows the creation of arcs
+    // Shift allows the creation of edges
     if (e.code == 'ShiftLeft') {
-        shiftHeld = false
+        shiftHeld = false;
     }
     // Ctrl allows multi selection
     else if (e.code == 'ControlLeft') {
-        ctrlHeld = false
+        ctrlHeld = false;
     }
     else if (e.code == 'Delete') {
 
@@ -342,21 +346,21 @@ addEventListener('keyup', (e) => {
 
                 // Deleting selected vertices
                 if (objects[i] instanceof Vertex) {
-                    objects.splice(i, 1)
-                    i--
+                    objects.splice(i, 1);
+                    i--;
                 }
             }
 
-            // deleting arc if it is selected or if either of its vertices are selected
+            // Deleting edge if it is selected or if either of its vertices are selected
             if (objects[i] instanceof Edge && (objects[i].isSelected || objects[i].vertex1.isSelected || objects[i].vertex2.isSelected)) {
-                objects.splice(i, 1)
-                i--
+                objects.splice(i, 1);
+                i--;
             }
         }
 
         // Clearing selected objects so no instances of deleted objects remain
         while (selectedObjects.length > 0) {
-            selectedObjects.pop()
+            selectedObjects.pop();
         }
     }
 
@@ -364,14 +368,14 @@ addEventListener('keyup', (e) => {
 
 // Determines if a point (x,y) is within a rectangle (z1, z2, z3, z4)
 function isInside(x, y, z1, z2, z3, z4) {
-    let x1 = Math.min(z1, z3)
-    let x2 = Math.max(z1, z3)
-    let y1 = Math.min(z2, z4)
-    let y2 = Math.max(z2, z4)
-    return !!((x1 <= x) && (x <= x2) && (y1 <= y) && (y <= y2))
+    let x1 = Math.min(z1, z3);
+    let x2 = Math.max(z1, z3);
+    let y1 = Math.min(z2, z4);
+    let y2 = Math.max(z2, z4);
+    return !!((x1 <= x) && (x <= x2) && (y1 <= y) && (y <= y2));
 }
 
 // Called to initiate the animation loop
-animate()
+animate();
 
 
