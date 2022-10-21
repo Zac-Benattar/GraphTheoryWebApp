@@ -87,7 +87,7 @@ class Vertex {
     }
 
     containsPoint(x, y) {
-        return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < nodeRadius * nodeRadius;
+        return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < vertexRadius * vertexRadius;
     }
 
     draw() {
@@ -119,6 +119,11 @@ class Edge {
         this.isSelected = false
     }
 
+    // !!!! Implement this !!!!
+    containsPoint() {
+        return false;
+    }
+
     draw() {
         /* Draws a line between the locations of the parents of the arc */
         c.strokeStyle = 'black'
@@ -141,49 +146,95 @@ class Edge {
     }
 }
 
-addEventListener('mousedown', (event) => {
-    if (event.button == 0) {
+function selectObject(x, y) {
+    for (const element of objects) {
+        if (element.containsPoint(x, y)) {
+            return element;
+        }
+    }
+
+    return null;
+}
+
+function crossBrowserElementPos(e) {
+    e = e || window.event;
+    var obj = e.target || e.srcElement;
+    var x = 0, y = 0;
+    while (obj.offsetParent) {
+        x += obj.offsetLeft;
+        y += obj.offsetTop;
+        obj = obj.offsetParent;
+    }
+    return { 'x': x, 'y': y };
+}
+
+function crossBrowserMousePos(e) {
+    e = e || window.event;
+    return {
+        'x': e.pageX || e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft,
+        'y': e.pageY || e.clientY + document.body.scrollTop + document.documentElement.scrollTop,
+    };
+}
+
+function crossBrowserRelativeMousePos(e) {
+    var element = crossBrowserElementPos(e);
+    var mouse = crossBrowserMousePos(e);
+    return {
+        'x': mouse.x - element.x,
+        'y': mouse.y - element.y
+    };
+}
+
+// Double click event creates a vertex
+canvas.ondblclick = function (e) {
+    var mousePos = crossBrowserRelativeMousePos(e);
+    selectedObject = selectObject(mousePos.x, mousePos.y);
+
+    if (selectedObject == null) {
+        selectedObject = new Vertex(mousePos.x, mousePos.y, vertexRadius, 'green', 'red');
+        selectedObject.isSelected = true;
+        selectedObjects.push(selectedObject);
+        objects.push(selectedObject);
+    }
+}
+
+// Mouse down event - selects a vertex
+canvas.onmousedown = function (e) {
+    if (e.button == 0) {
         primaryMouseButtonDown = true
 
-        let selectedObject = null
-        mouseDownX = event.clientX
-        mouseDownY = event.clientY
+        var mousePos = crossBrowserRelativeMousePos(e);
+        mouseDownX = mousePos.x;
+        mouseDownY = mousePos.y;
+        let selectedObject = selectObject(mousePos.x, mousePos.y);
 
-        // Determining if an object has been clicked on, with small extra margin
-        for (const element of objects) {
-            const xdif = event.clientX - element.x
-            const ydif = event.clientY - element.y
+        if (selectedObject != null) {
+            // If shift is held when a vertex is clicked we must add an arc between it and all selected vertices
+            if (shiftHeld) {
+                for (let j = 0; j < selectedObjects.length; j++) {
+                    if (selectedObjects[j] instanceof Vertex) {
 
-            if (Math.sqrt(Math.pow(xdif, 2) + Math.pow(ydif, 2)) < vertexRadius + 2) {
+                        // Create a new arc between vertices
+                        let arc = new Edge(selectedObjects[j], element, 'black', 'red');
 
-                // If shift is held when a vertex is clicked we must add an arc between it and all selected vertices
-                if (shiftHeld) {
-                    for (let j = 0; j < selectedObjects.length; j++) {
-                        if (selectedObjects[j] instanceof Vertex) {
-    
-                            // create a new arc between vertices
-                            let arc = new Edge(selectedObjects[j], element, 'black', 'red')
+                        // Add the arc to the vertices list of arcs
+                        selectedObjects[j].arcs.push(arc);
+                        element.arcs.push(arc);
 
-                            // Add the arc to the vertices list of arcs
-                            selectedObjects[j].arcs.push(arc)
-                            element.arcs.push(arc)
-
-                            // Push arc to objects array so it is persistant and drawn
-                            objects.push(arc)
-                        }
+                        // Push arc to objects array so it is persistant and drawn
+                        objects.push(arc);
                     }
                 }
-
-                // Selecting the object we clicked on, add it to the selected array if its not already there
-                if (!element.isSelected) {
-                    element.isSelected = true
-                    selectedObjects.push(element)
-                }
-                selectedObject = element
-                dragInAction = true
-
-                break
             }
+
+            // Ensuring the clicked on element is selected and in selected list
+            if (!selectedObject.isSelected) {
+                selectObject.isSelected = true;
+                selectedObjects.push(selectedObject);
+            }
+
+            // Begins a drag action
+            dragInAction = true;
         }
 
         if (!ctrlHeld) {
@@ -193,7 +244,7 @@ addEventListener('mousedown', (event) => {
             }
             selectedObjects.length = 0
 
-            // Selecting the object clicked on (if one was clicked on)
+            // Re-selecting the object clicked on (if one was clicked on)
             if (selectedObject != null) {
                 selectedObject.isSelected = true
                 selectedObjects.push(selectedObject)
@@ -201,94 +252,88 @@ addEventListener('mousedown', (event) => {
         }
 
     }
+}
 
-})
-
-addEventListener('mouseup', (event) => {
-
+canvas.onmouseup = function (e) {
     // Determine if mouse1 has been lifted
-    if (event.button == 0) {
-        primaryMouseButtonDown = false
-
-        // If no object was clicked on and no drag action performed then we create a new node
-        if (!dragInAction && !dragSelectInAction) {
-            const vert = new Vertex(event.clientX - vertexRadius / 2, event.clientY - vertexRadius / 2, vertexRadius, 'green', 'red')
-            vert.isSelected = true
-            selectedObjects.push(vert)
-            objects.push(vert)
-        }
-        dragInAction = false
-        dragSelectInAction = false
+    if (e.button == 0) {
+        primaryMouseButtonDown = false;
+        dragInAction = false;
+        dragSelectInAction = false;
     }
+}
 
-})
+canvas.onmousemove = function (e) {
 
-addEventListener('mousemove', (event) => {
+    var mousePos = crossBrowserRelativeMousePos(e);
+    
+
 
     // Calculating the distance the mouse has travelled since the previous mouse movement
-    prevMouseX = mouseX
-    prevMouseY = mouseY
-    mouseX = event.clientX
-    mouseY = event.clientY
-    const xdif = event.clientX - prevMouseX
-    const ydif = event.clientY - prevMouseY
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
+    mouseX = mousePos.x;
+    mouseY = mousePos.y;
+    const xdif = e.clientX - prevMouseX;
+    const ydif = e.clientY - prevMouseY;
 
     // Moving each selected object
     if (dragInAction) {
         for (const element of selectedObjects) {
-            element.x = element.x + xdif
-            element.y = element.y + ydif
+            element.x = element.x + xdif;
+            element.y = element.y + ydif;
         }
     }
     /* If the user is not dragging objects then they are performing a drag select,
     hence we draw a rectange (in animate()) and here select all objects within */
     else if (primaryMouseButtonDown) {
-        dragSelectInAction = true
+        dragSelectInAction = true;
         // Loop through all objects to determine if selected, probably a fast way of doing this
         for (const element of objects) {
             // Selected objects in rectangle
             if (isInside(element.x, element.y, mouseDownX, mouseDownY, mouseX, mouseY)) {
-                element.isSelected = true
-                selectedObjects.push(element)
+                element.isSelected = true;
+                selectedObjects.push(element);
             }
+
             // De-selected objects outside of the rectange if ctrl not held
             else if (!ctrlHeld) {
                 if (element.isSelected) {
-                    element.isSelected = false
+                    element.isSelected = false;
                     for (let j = 0; j < selectedObjects.length; j++) {
                         if (selectedObjects[j] == element) {
-                            selectedObjects.splice(j, 1)
-                            break
+                            selectedObjects.splice(j, 1);
+                            break;
                         }
                     }
                 }
             }
         }
     }
-})
+}
 
-addEventListener('keydown', (event) => {
+addEventListener('keydown', (e) => {
     // Shift is used to draw arcs from selected nodes
-    if (event.code == 'ShiftLeft') {
+    if (e.code == 'ShiftLeft') {
         shiftHeld = true
     }
     // Ctrl is used for multi select
-    else if (event.code == 'ControlLeft') {
+    else if (e.code == 'ControlLeft') {
         ctrlHeld = true
     }
 
 })
 
-addEventListener('keyup', (event) => {
+addEventListener('keyup', (e) => {
     // Shift allows the creation of arcs
-    if (event.code == 'ShiftLeft') {
+    if (e.code == 'ShiftLeft') {
         shiftHeld = false
     }
     // Ctrl allows multi selection
-    else if (event.code == 'ControlLeft') {
+    else if (e.code == 'ControlLeft') {
         ctrlHeld = false
     }
-    else if (event.code == 'Delete') {
+    else if (e.code == 'Delete') {
 
         // Deleting all selected objects
         for (let i = 0; i < objects.length; i++) {
