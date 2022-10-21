@@ -25,6 +25,7 @@ let prevMouseX = 0
 let prevMouseY = 0
 let mouseDownX = 0
 let mouseDownY = 0
+let clickedObjectPadding = 5;
 
 // Visual adjustments, eventually user should be able to adjust
 let vertexRadius = 13
@@ -121,7 +122,12 @@ class Edge {
 
     // !!!! Implement this !!!!
     containsPoint() {
-        return false;
+        var dx = vertex1.x - vertex2.x;
+        var dy = vertex1.y - vertex2.y;
+        var length = Math.sqrt(dx * dx + dy * dy);
+        var percent = (dx * (x - vertex1.x) + dy * (y - vertex1.y)) / (length * length);
+        var distance = (dx * (y - vertex1.y) - dy * (x - vertex1.x)) / length;
+        return (percent > 0 && percent < 1 && Math.abs(distance) < clickedObjectPadding);
     }
 
     draw() {
@@ -198,7 +204,7 @@ canvas.ondblclick = function (e) {
     }
 }
 
-// Mouse down event - selects a vertex
+// Mouse down event - selects a vertex or edge
 canvas.onmousedown = function (e) {
     if (e.button == 0) {
         // Getting mouse position and the object under it
@@ -214,20 +220,11 @@ canvas.onmousedown = function (e) {
             isAlreadySelected = selectedObject.isSelected;
         }
 
-        if (!ctrlHeld) {
-            // Deselecting all objects if ctrl not held
-            for (const element of selectedObjects) {
-                element.isSelected = false
-            }
-            selectedObjects.length = 0
-        }
-
         if (selectedObject != null) {
             // If shift is held when a vertex is clicked we must add an arc between it and all selected vertices
             if (shiftHeld) {
                 for (let j = 0; j < selectedObjects.length; j++) {
                     if (selectedObjects[j] instanceof Vertex) {
-
                         // Create a new edge between vertices
                         let edge = new Edge(selectedObject, selectedObjects[j]);
 
@@ -241,6 +238,19 @@ canvas.onmousedown = function (e) {
                 }
             }
 
+            // Begins a drag action
+            dragInAction = true;
+        }
+
+        // Deselecting all objects if ctrl not held
+        if (!ctrlHeld) {
+            for (const element of selectedObjects) {
+                element.isSelected = false
+            }
+            selectedObjects.length = 0
+        }
+
+        if (selectedObject != null) {
             // Toggle whether the clicked object is selected and in selected list
             if (isAlreadySelected) {
                 selectedObject.isSelected = false;
@@ -250,9 +260,6 @@ canvas.onmousedown = function (e) {
                 selectedObject.isSelected = true;
                 selectedObjects.push(selectedObject);
             }
-
-            // Begins a drag action
-            dragInAction = true;
         }
 
     }
