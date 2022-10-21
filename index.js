@@ -120,23 +120,31 @@ class Edge {
         this.isSelected = false;
     }
 
-    // !!!! Implement this !!!!
-    containsPoint() {
-        var dx = vertex1.x - vertex2.x;
-        var dy = vertex1.y - vertex2.y;
+    // Returns if given coords are on the line (with padding)
+    containsPoint(x, y) {
+        var dx = this.vertex1.x - this.vertex2.x;
+        var dy = this.vertex1.y - this.vertex2.y;
         var length = Math.sqrt(dx * dx + dy * dy);
-        var percent = (dx * (x - vertex1.x) + dy * (y - vertex1.y)) / (length * length);
-        var distance = (dx * (y - vertex1.y) - dy * (x - vertex1.x)) / length;
+        var percent = (dx * (x - this.vertex1.x) + dy * (y - this.vertex1.y)) / (length * length);
+        var distance = (dx * (y - this.vertex1.y) - dy * (x - this.vertex1.x)) / length;
+        console.log(percent);
+        console.log(distance);
         return (percent > 0 && percent < 1 && Math.abs(distance) < clickedObjectPadding);
     }
 
     draw() {
         /* Draws a line between the parents of the arc */
-        c.strokeStyle = 'black';
+        if (!this.isSelected) {
+            c.strokeStyle = this.colour;
+        }
+        else {
+            c.strokeStyle = this.selectedcolour;
+        }
+
         c.lineWidth = 5;
 
-        var v1ClosePoint = this.vertex1.closestPointOnCircleToGivenPoint(this.vertex2.x, this.vertex2.y);
-        var v2ClosePoint = this.vertex2.closestPointOnCircleToGivenPoint(this.vertex1.x, this.vertex1.y);
+        var v1ClosePoint = this.vertex1.closestPointOnVertexToGivenPoint(this.vertex2.x, this.vertex2.y);
+        var v2ClosePoint = this.vertex2.closestPointOnVertexToGivenPoint(this.vertex1.x, this.vertex1.y);
 
         c.beginPath();
         c.moveTo(v1ClosePoint.x, v1ClosePoint.y);
@@ -153,6 +161,7 @@ class Edge {
 function selectObject(x, y) {
     for (const element of objects) {
         if (element.containsPoint(x, y)) {
+            console.log(element);
             return element;
         }
     }
