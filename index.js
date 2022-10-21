@@ -132,23 +132,20 @@ class Edge {
 
     draw() {
         /* Draws a line between the locations of the parents of the arc */
-        c.strokeStyle = 'black'
-        c.lineWidth = 5
+        c.strokeStyle = 'black';
+        c.lineWidth = 5;
 
-        c.beginPath()
-        c.moveTo(this.vertex1.x, this.vertex1.y)
-        c.lineTo(this.vertex2.x, this.vertex2.y)
-        c.stroke()
+        var v1ClosePoint = this.vertex1.closestPointOnCircleToGivenPoint(this.vertex2.x, this.vertex2.y);
+        var v2ClosePoint = this.vertex2.closestPointOnCircleToGivenPoint(this.vertex1.x, this.vertex1.y);
 
-        c.fillStyle = 'black'
-        c.beginPath()
-        c.arc(this.vertex1.x, this.vertex1.y, 2, 0, Math.PI * 2, false)
-        c.arc(this.vertex2.x, this.vertex2.y, 2, 0, Math.PI * 2, false)
-        c.fill()
+        c.beginPath();
+        c.moveTo(v1ClosePoint.x, v1ClosePoint.y);
+        c.lineTo(v2ClosePoint.x, v2ClosePoint.y);
+        c.stroke();
     }
 
     update() {
-        this.draw()
+        this.draw();
     }
 }
 
