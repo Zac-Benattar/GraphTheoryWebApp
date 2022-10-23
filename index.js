@@ -169,7 +169,7 @@ function selectObject(x, y) {
 }
 
 // Returns the mouse position within the canvas when given a mouse event
-function mousePos(e) {
+function getMousePos(e) {
     var rect = canvas.getBoundingClientRect();
     var scaleX = canvas.width / rect.width;
     var scaleY = canvas.height / rect.height;
@@ -182,7 +182,7 @@ function mousePos(e) {
 
 // Double click event creates a vertex
 canvas.ondblclick = function (e) {
-    var mousePos = mousePos(e);
+    var mousePos = getMousePos(e);
     selectedObject = selectObject(mousePos.x, mousePos.y);
 
     if (selectedObject == null) {
@@ -198,7 +198,7 @@ canvas.onmousedown = function (e) {
     if (e.button == 0) {
         // Getting mouse position and the object under it
         primaryMouseButtonDown = true;
-        var mousePos = mousePos(e);
+        var mousePos = getMousePos(e);
         mouseDownX = mousePos.x;
         mouseDownY = mousePos.y;
         var selectedObject = selectObject(mousePos.x, mousePos.y);
@@ -266,7 +266,7 @@ canvas.onmouseup = function (e) {
 // Handles moving of objects and computing drag selects
 canvas.onmousemove = function (e) {
 
-    var mousePos = mousePos(e);
+    var mousePos = getMousePos(e);
 
     // Calculating the distance the mouse has travelled since the previous mouse movement
     prevMouseX = mouseX;
