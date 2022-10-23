@@ -129,7 +129,7 @@ class Edge {
         var distance = (dx * (y - this.vertex1.y) - dy * (x - this.vertex1.x)) / length;
         console.log(percent);
         console.log(distance);
-        return (percent > 0 && percent < 1 && Math.abs(distance) < clickedObjectPadding);
+        return (percent < 0 && percent > -1 && Math.abs(distance) < clickedObjectPadding);
     }
 
     draw() {
