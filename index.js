@@ -28,7 +28,7 @@ let mouseDownY = 0;
 let clickedObjectPadding = 5;
 
 // Visual adjustments, eventually user should be able to adjust
-let vertexRadius = 13;
+let vertexRadius = 20;
 
 // Handles drawing frames, in an infinite loop
 function animate() {
@@ -40,15 +40,19 @@ function animate() {
 
     // Draws potential arcs (lines from all selected vertices)
     if (shiftHeld) {
-        // !!!! ADD CHECK FOR ELEMENT TO BE A VERTEX !!!!
         for (const element of selectedObjects) {
-            c.strokeStyle = 'black';
-            c.lineWidth = 5;
-
-            c.beginPath();
-            c.moveTo(element.x, element.y);
-            c.lineTo(mouseX, mouseY);
-            c.stroke();
+            console.log(element.type);
+            if (element.type == 'vertex') {
+                c.strokeStyle = 'black';
+                // Set the line width relative to the size of vertices, wider than final edge size
+                c.lineWidth = vertexRadius / 3;
+                var edgeOfVertex = element.closestPointOnVertexToGivenPoint(mouseX, mouseY);
+    
+                c.beginPath();
+                c.moveTo(edgeOfVertex.x, edgeOfVertex.y);
+                c.lineTo(mouseX, mouseY);
+                c.stroke();
+            }
         }
     }
 
@@ -68,6 +72,7 @@ easily traversed */
 class Vertex {
     constructor(x, y) {
         this.id = Math.floor(Math.random() * 100);
+        this.type = 'vertex';
         this.x = x;
         this.y = y;
         this.radius = vertexRadius;
@@ -110,9 +115,11 @@ class Vertex {
     }
 }
 
+/* Edges are the other half of a graph, they connect vertices. Rendered from the edge of vertices */
 class Edge {
     constructor(vertex1, vertex2) {
         this.id = Math.floor(Math.random() * 100);
+        this.type = 'edge';
         this.vertex1 = vertex1;
         this.vertex2 = vertex2;
         this.colour = 'black';
@@ -127,8 +134,6 @@ class Edge {
         var length = Math.sqrt(dx * dx + dy * dy);
         var percent = (dx * (x - this.vertex1.x) + dy * (y - this.vertex1.y)) / (length * length);
         var distance = (dx * (y - this.vertex1.y) - dy * (x - this.vertex1.x)) / length;
-        console.log(percent);
-        console.log(distance);
         return (percent < 0 && percent > -1 && Math.abs(distance) < clickedObjectPadding);
     }
 
@@ -141,7 +146,8 @@ class Edge {
             c.strokeStyle = this.selectedcolour;
         }
 
-        c.lineWidth = 5;
+        // Scales the width of the edge with the size of the vertices
+        c.lineWidth = vertexRadius / 4;
 
         var v1ClosePoint = this.vertex1.closestPointOnVertexToGivenPoint(this.vertex2.x, this.vertex2.y);
         var v2ClosePoint = this.vertex2.closestPointOnVertexToGivenPoint(this.vertex1.x, this.vertex1.y);
@@ -209,11 +215,11 @@ canvas.onmousedown = function (e) {
             isAlreadySelected = selectedObject.isSelected;
         }
 
-        if (selectedObject != null) {
+        if (selectedObject != null && selectedObject.type == 'vertex') {
             // If shift is held when a vertex is clicked we must add an arc between it and all selected vertices
             if (shiftHeld) {
                 for (let j = 0; j < selectedObjects.length; j++) {
-                    if (selectedObjects[j] instanceof Vertex) {
+                    if (selectedObjects[j].type == 'vertex') {
                         // Create a new edge between vertices
                         let edge = new Edge(selectedObject, selectedObjects[j]);
 
