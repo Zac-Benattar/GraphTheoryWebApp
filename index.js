@@ -161,7 +161,6 @@ class Edge {
 function selectObject(x, y) {
     for (const element of objects) {
         if (element.containsPoint(x, y)) {
-            console.log(element);
             return element;
         }
     }
@@ -169,39 +168,21 @@ function selectObject(x, y) {
     return null;
 }
 
-// Set of stolen functions to try to make relative mouse positions work in the canvas, doesnt work at time of implementation/theft
-function crossBrowserElementPos(e) {
-    e = e || window.event;
-    var obj = e.target || e.srcElement;
-    var x = 0, y = 0;
-    while (obj.offsetParent) {
-        x += obj.offsetLeft;
-        y += obj.offsetTop;
-        obj = obj.offsetParent;
-    }
-    return { 'x': x, 'y': y };
-}
+// Returns the mouse position within the canvas when given a mouse event
+function mousePos(e) {
+    var rect = canvas.getBoundingClientRect();
+    var scaleX = canvas.width / rect.width;
+    var scaleY = canvas.height / rect.height;
 
-function crossBrowserMousePos(e) {
-    e = e || window.event;
     return {
-        'x': e.pageX || e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft,
-        'y': e.pageY || e.clientY + document.body.scrollTop + document.documentElement.scrollTop,
-    };
-}
-
-function crossBrowserRelativeMousePos(e) {
-    var element = crossBrowserElementPos(e);
-    var mouse = crossBrowserMousePos(e);
-    return {
-        'x': mouse.x - element.x,
-        'y': mouse.y - element.y
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
     };
 }
 
 // Double click event creates a vertex
 canvas.ondblclick = function (e) {
-    var mousePos = crossBrowserRelativeMousePos(e);
+    var mousePos = mousePos(e);
     selectedObject = selectObject(mousePos.x, mousePos.y);
 
     if (selectedObject == null) {
@@ -217,7 +198,7 @@ canvas.onmousedown = function (e) {
     if (e.button == 0) {
         // Getting mouse position and the object under it
         primaryMouseButtonDown = true;
-        var mousePos = crossBrowserRelativeMousePos(e);
+        var mousePos = mousePos(e);
         mouseDownX = mousePos.x;
         mouseDownY = mousePos.y;
         var selectedObject = selectObject(mousePos.x, mousePos.y);
@@ -285,7 +266,7 @@ canvas.onmouseup = function (e) {
 // Handles moving of objects and computing drag selects
 canvas.onmousemove = function (e) {
 
-    var mousePos = crossBrowserRelativeMousePos(e);
+    var mousePos = mousePos(e);
 
     // Calculating the distance the mouse has travelled since the previous mouse movement
     prevMouseX = mouseX;
