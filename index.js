@@ -43,15 +43,17 @@ function animate() {
         for (const element of selectedObjects) {
             console.log(element.type);
             if (element.type == 'vertex') {
-                c.strokeStyle = 'black';
-                // Set the line width relative to the size of vertices, wider than final edge size
-                c.lineWidth = vertexRadius / 3;
-                var edgeOfVertex = element.closestPointOnVertexToGivenPoint(mouseX, mouseY);
-    
-                c.beginPath();
-                c.moveTo(edgeOfVertex.x, edgeOfVertex.y);
-                c.lineTo(mouseX, mouseY);
-                c.stroke();
+                if (!element.containsPoint(mouseX, mouseY)) {
+                    c.strokeStyle = 'black';
+                    // Set the line width relative to the size of vertices, wider than final edge size
+                    c.lineWidth = vertexRadius / 3;
+                    var edgeOfVertex = element.closestPointOnVertexToGivenPoint(mouseX, mouseY);
+
+                    c.beginPath();
+                    c.moveTo(edgeOfVertex.x, edgeOfVertex.y);
+                    c.lineTo(mouseX, mouseY);
+                    c.stroke();
+                }
             }
         }
     }
