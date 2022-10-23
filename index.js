@@ -279,8 +279,8 @@ canvas.onmousemove = function (e) {
     prevMouseY = mouseY;
     mouseX = mousePos.x;
     mouseY = mousePos.y;
-    const xdif = e.clientX - prevMouseX;
-    const ydif = e.clientY - prevMouseY;
+    const xdif = mouseX - prevMouseX;
+    const ydif = mouseY - prevMouseY;
 
     // Moving each selected object
     if (dragInAction) {
@@ -289,6 +289,7 @@ canvas.onmousemove = function (e) {
             element.y = element.y + ydif;
         }
     }
+
     /* If the user is not dragging objects then they are performing a drag select,
     hence we draw a rectange (in animate()) and here select all objects within */
     else if (primaryMouseButtonDown) {
