@@ -17,6 +17,7 @@ let dragSelectInAction = false;
 let shiftHeld = false;
 let ctrlHeld = false;
 let dragInAction = false;
+let forceArrangement = true;
 
 // Location variables for mouse related properties
 let mouseX = 0;
@@ -38,10 +39,14 @@ function animate() {
         object.update();
     })
 
+    // Performs a force-directed graph drawing step if the user has the option selected
+    if (forceArrangement) {
+        forceArrangementStep();
+    }
+
     // Draws potential arcs (lines from all selected vertices)
     if (shiftHeld) {
         for (const element of selectedObjects) {
-            console.log(element.type);
             if (element.type == 'vertex') {
                 if (!element.containsPoint(mouseX, mouseY)) {
                     c.strokeStyle = 'black';
@@ -68,12 +73,78 @@ function animate() {
     }
 }
 
+// Calculates and applies the forces to be applied to each vertex in force-directed graph drawing
+function forceArrangementStep() {
+    for (let i = 0; i < objects.length; i++) {
+        if (objects[i].type == 'vertex') {
+
+            var ax, ay = 0; // Attractive force between vertices
+            var ex, ey = 0; // Edge attractive force between vertices
+            var rx, ry = 0; // Repulsive force between vertices
+            var cx, cy = 0; // Attractive force between vertex and centre
+
+            for (let j = 0; j < objects.length; j++) {
+                if (objects[j].type == 'vertex' && i != j) {
+                    /* Computing forces a and r. Get difference in x and y coords, calculate the square of the distance between vertices,
+                    and find the percent of the distance is in each of the x and y directions */
+                    var dx = objects[i].x - objects[j].x;
+                    var dy = objects[i].y - objects[j].y;
+                    var distanceSquare = distanceSquared(objects[i].x, objects[i].y, objects[j].x, objects[j].y);
+                    var angle = Math.atan2(dy, dx);
+
+                    // Constant * Component of force in x/y direction * Strength of force
+                    ax += 0.5 * Math.cos(angle) * Math.log(Math.sqrt(distanceSquare));
+                    ay += 0.5 * Math.sin(angle) * Math.log(Math.sqrt(distanceSquare));
+                    rx += 1 / distanceSquare * Math.cos(angle);
+                    ry += 1 / distanceSquare * Math.sin(angle);
+                }
+            }
+
+            // Computes force e
+            for (let j = 0; j < objects[i].edges.length; j++) {
+                if (objects[i].edges[j] != objects[i]) {
+
+                }
+            }
+
+            // Computes force c
+            var cForce = distance(objects[i].x, objects[i].y, canvas.width / 2, canvas.height / 2) / 1000;
+            var dx = objects[i].x - canvas.width / 2;
+            var dy = objects[i].y - canvas.height / 2;
+            var angle = Math.atan2(dy, dx);
+            cx = Math.cos(angle) * cForce;
+            cy = Math.sin(angle) * cForce;
+
+            // Sums the forces in each component, and applies them to the vertex
+            var resultantStepX = (ax + ex + cx - rx) / 5;
+            var resultantStepY = (ay + ey + cy - ry) / 5;
+            if (Math.abs(resultantStepX) > 2) {
+                objects[i].x = objects[i].x + (resultantStepX);
+            }
+            if (Math.abs(resultantStepY) > 2) { 
+                objects[i].y = objects[i].y + (resultantStepY);
+            }
+            console.log(resultantStepX, resultantStepY);
+        }
+    }
+}
+
+// Returns the distance between two points
+function distance(x1, y1, x2, y2) {
+    return Math.sqrt(distanceSquared(x1, y1, x2, y2));
+}
+
+// Returns the square of the distance between two points
+function distanceSquared(x1, y1, x2, y2) {
+    return (Math.pow(x1 - x2, 2)) + (Math.pow(y1 - y2, 2));
+}
+
 /* Vertices are one half of a graph. The location variables (x and y) are the at the 
 centre of the vertex. Each vertex holds a list of its arcs so its neighbours can be 
 easily traversed */
 class Vertex {
     constructor(x, y) {
-        this.id = Math.floor(Math.random() * 100);
+        this.id = Math.floor(Math.random() * 10000);
         this.type = 'vertex';
         this.x = x;
         this.y = y;
@@ -81,7 +152,7 @@ class Vertex {
         this.colour = 'green';
         this.selectedColour = 'red';
         this.isSelected = false;
-        this.arcs = [];
+        this.edges = [];
     }
 
     closestPointOnVertexToGivenPoint(x, y) {
@@ -120,7 +191,7 @@ class Vertex {
 /* Edges are the other half of a graph, they connect vertices. Rendered from the edge of vertices */
 class Edge {
     constructor(vertex1, vertex2) {
-        this.id = Math.floor(Math.random() * 100);
+        this.id = Math.floor(Math.random() * 10000);
         this.type = 'edge';
         this.vertex1 = vertex1;
         this.vertex2 = vertex2;
