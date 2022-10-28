@@ -1,143 +1,143 @@
 /* Default (Light Mode) style */
 body {
-	text-align: center;
-    color:#121212;
-	background: #DFDFDF;
-	margin: 0 30px 100px 30px;
-	font: 14px/18px 'Verdana', 'Segoe UI', sans-serif;
+  text-align: center;
+  color: #121212;
+  background: #DFDFDF;
+  margin: 0 30px 100px 30px;
+  font: 14px/18px 'Verdana', 'Segoe UI', sans-serif;
 }
 
 canvas {
-	display: block;
-	max-width: 1800px;
-	background: white;
-	border-radius: 20px;
-	-moz-border-radius: 20px;
-	margin: 10px auto;
+  display: block;
+  max-width: 1800px;
+  background: white;
+  border-radius: 20px;
+  -moz-border-radius: 20px;
+  margin: 10px auto;
 }
 
 h1 {
-	font: bold italic 50px Georgia, serif;
+  font: bold italic 50px Georgia, serif;
 }
 
 a {
-	color: black;
+  color: black;
 }
 
 div {
-	margin: 30px auto;
-	text-align: left;
-	max-width: 800px;
+  margin: 30px auto;
+  text-align: left;
+  max-width: 800px;
 }
 
 div.minidiv {
-    margin: 0px auto;
-    text-align: left;
-    max-width: 200px;
+  margin: 0px auto;
+  text-align: left;
+  max-width: 200px;
 }
 
 .error {
-	display: block;
-	color: red;
-	font-size: 28px;
-	line-height: 30px;
-	padding: 30px;
+  display: block;
+  color: red;
+  font-size: 28px;
+  line-height: 30px;
+  padding: 30px;
 }
 
 p {
-	margin: 30px 0;
-	line-height: 20px;
+  margin: 30px 0;
+  line-height: 20px;
 }
 
 .center {
-	text-align: center;
+  text-align: center;
 }
 
 textarea {
-	display: none;
-	width: 75%;
-	height: 400px;
-	margin: 0 auto;
+  display: none;
+  width: 75%;
+  height: 400px;
+  margin: 0 auto;
 }
 
- /* The switch - the box around the slider */
- .switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-  }
-  
-  /* Hide default HTML checkbox */
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  /* The slider */
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .3s;
-    transition: .3s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 22px;
-    width: 22px;
-    left: 2px;
-    bottom: 2px;
-    background-color: white;
-    -webkit-transition: .3s;
-    transition: .3s;
-  }
-  
-  input:checked + .slider {
-    background-color: #3b3b3b;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(22px);
-    -ms-transform: translateX(22px);
-    transform: translateX(22px);
-  }
-  
-  /* Rounded sliders */
-  .slider.round {
-    border-radius: 26px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  } 
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  -webkit-transition: .3s;
+  transition: .3s;
+}
+
+input:checked+.slider {
+  background-color: #3b3b3b;
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.slider:before {
+  -webkit-transform: translateX(22px);
+  -ms-transform: translateX(22px);
+  transform: translateX(22px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 26px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
 
 /* Dark Mode style */
 body.dark-theme {
-    color: #eee;
-    background: #121212;
+  color: #eee;
+  background: #121212;
 }
 
-body.dark-theme canvas{
-    color: #eee;
-    background: #252525;
+body.dark-theme canvas {
+  color: #eee;
+  background: #252525;
 }
 
 body.dark-theme h1 {
-	font: bold italic 50px Georgia, serif;
+  font: bold italic 50px Georgia, serif;
 }
 
 body.dark-theme a {
-    color: rgb(196, 196, 196)
+  color: rgb(196, 196, 196)
 }
