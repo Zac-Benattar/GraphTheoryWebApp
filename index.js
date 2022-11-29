@@ -247,17 +247,8 @@ canvas.onmousedown = function (e) {
             selectedObjects.length = 0;
         }
 
-        if (selectedObject != null) {
-            // Toggle whether the clicked object is selected and in selected list
-            if (isAlreadySelected) {
-                selectedObject.isSelected = false;
-                selectedObjects.splice(selectedObjects.findIndex(p => p.id == selectedObject.id));
-            }
-            else {
-                selectedObject.isSelected = true;
-                selectedObjects.push(selectedObject);
-            }
-        }
+        selectedObject.isSelected = true;
+        selectedObjects.push(selectedObject);
 
     }
 }
