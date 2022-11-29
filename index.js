@@ -28,7 +28,7 @@ let mouseDownY = 0;
 let clickedObjectPadding = 5;
 
 // Visual adjustments, eventually user should be able to adjust
-let vertexRadius = 20;
+let defaultVertexRadius = 20;
 
 // Handles drawing frames, in an infinite loop
 function animate() {
@@ -77,7 +77,7 @@ class Vertex {
         this.type = 'vertex';
         this.x = x;
         this.y = y;
-        this.radius = vertexRadius;
+        this.radius = defaultVertexRadius;
         this.colour = 'green';
         this.selectedColour = 'red';
         this.isSelected = false;
@@ -95,7 +95,7 @@ class Vertex {
     }
 
     containsPoint(x, y) {
-        return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < vertexRadius * vertexRadius;
+        return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < this.radius * this.radius;
     }
 
     draw() {
@@ -127,6 +127,7 @@ class Edge {
         this.colour = 'black';
         this.selectedcolour = 'red';
         this.isSelected = false;
+        this.weight = 0;
     }
 
     // Returns if given coords are on the line (with padding)
@@ -247,10 +248,10 @@ canvas.onmousedown = function (e) {
             selectedObjects.length = 0;
         }
 
-        // If ctrl is held and the object is already selected, 
-        // we want to deselect it when we click on it,
-        // this deselection should be done when mouse click is lifted
-        // but this is not implemented yet so this is temporary
+        /* If ctrl is held and the object is already selected, 
+            we want to deselect it when we click on it,
+            this deselection should be done when mouse click is lifted
+            but this is not implemented yet so this is temporary */
         if (ctrlHeld && isAlreadySelected) {
             // Toggle whether the clicked object is selected and in selected list
                 selectedObject.isSelected = false;
@@ -372,6 +373,22 @@ addEventListener('keyup', (e) => {
 
 })
 
+function resizeCanvas() {
+    canvas.width = window.innerWidth - 100;
+    canvas.height = window.innerHeight;
+    oldDefaultVertexRadius = defaultVertexRadius;
+    defaultVertexRadius = canvas.width / 50;
+    for (let i = 0; i < objects.length; i++) {
+        if (objects[i] instanceof Vertex) {
+            objects[i].radius = max(objects[i].radius / oldDefaultVertexRadius * defaultVertexRadius, 5);
+        }
+    }
+}
+
+window.addEventListener('resize', (e) => {
+    resizeCanvas();
+})
+
 // Determines if a point (x,y) is within a rectangle (z1, z2, z3, z4)
 function isInside(x, y, z1, z2, z3, z4) {
     let x1 = Math.min(z1, z3);
@@ -380,6 +397,9 @@ function isInside(x, y, z1, z2, z3, z4) {
     let y2 = Math.max(z2, z4);
     return !!((x1 <= x) && (x <= x2) && (y1 <= y) && (y <= y2));
 }
+
+// Adjust canvas size to screen size
+resizeCanvas();
 
 // Called to initiate the animation loop
 animate();
