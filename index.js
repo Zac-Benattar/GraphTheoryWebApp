@@ -247,8 +247,19 @@ canvas.onmousedown = function (e) {
             selectedObjects.length = 0;
         }
 
-        selectedObject.isSelected = true;
-        selectedObjects.push(selectedObject);
+        // If ctrl is held and the object is already selected, 
+        // we want to deselect it when we click on it,
+        // this deselection should be done when mouse click is lifted
+        // but this is not implemented yet so this is temporary
+        if (ctrlHeld && isAlreadySelected) {
+            // Toggle whether the clicked object is selected and in selected list
+                selectedObject.isSelected = false;
+                selectedObjects.splice(selectedObjects.findIndex(p => p.id == selectedObject.id));
+        } else {
+            // Selecting the object we clicked on
+            selectedObject.isSelected = true;
+            selectedObjects.push(selectedObject);
+        } 
 
     }
 }
