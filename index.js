@@ -17,6 +17,7 @@ let dragSelectInAction = false;
 let shiftHeld = false;
 let ctrlHeld = false;
 let dragInAction = false;
+let enableWeights = true;
 
 // Location variables for mouse related properties
 let mouseX = 0;
@@ -159,6 +160,11 @@ class Edge {
         c.moveTo(v1ClosePoint.x, v1ClosePoint.y);
         c.lineTo(v2ClosePoint.x, v2ClosePoint.y);
         c.stroke();
+
+        if (enableWeights) {
+            c.font = '60px ui-sans-serif';
+            c.fillText(this.weight, (this.vertex1.x + this.vertex2.x) / 2, (this.vertex1.y + this.vertex2.y) / 2);
+        }
     }
 
     update() {
