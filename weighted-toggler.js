@@ -1,2 +1,2 @@
 // Find toggle dark mode button
-const darkModeToggle = document.querySelector('#weighted-toggle');
+const weightedModeToggle = document.querySelector('#weighted-toggle');

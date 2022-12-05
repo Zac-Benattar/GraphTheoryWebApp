@@ -248,19 +248,22 @@ canvas.onmousedown = function (e) {
             selectedObjects.length = 0;
         }
 
-        /* If ctrl is held and the object is already selected, 
-            we want to deselect it when we click on it,
-            this deselection should be done when mouse click is lifted
-            but this is not implemented yet so this is temporary */
-        if (ctrlHeld && isAlreadySelected) {
-            // Toggle whether the clicked object is selected and in selected list
+        if (selectedObject != null) {
+            /* If ctrl is held and the object is already selected, 
+                we want to deselect it when we click on it,
+                this deselection should be done when mouse click is lifted
+                but this is not implemented yet so this is temporary */
+            if (ctrlHeld && isAlreadySelected) {
+                // Toggle whether the clicked object is selected and in selected list
                 selectedObject.isSelected = false;
                 selectedObjects.splice(selectedObjects.findIndex(p => p.id == selectedObject.id));
-        } else {
-            // Selecting the object we clicked on
-            selectedObject.isSelected = true;
-            selectedObjects.push(selectedObject);
-        } 
+            } else {
+                // Selecting the object we clicked on
+                selectedObject.isSelected = true;
+                selectedObjects.push(selectedObject);
+            }
+        }
+
 
     }
 }
@@ -380,7 +383,7 @@ function resizeCanvas() {
     defaultVertexRadius = canvas.width / 50;
     for (let i = 0; i < objects.length; i++) {
         if (objects[i] instanceof Vertex) {
-            objects[i].radius = max(objects[i].radius / oldDefaultVertexRadius * defaultVertexRadius, 5);
+            objects[i].radius = Math.max(objects[i].radius / oldDefaultVertexRadius * defaultVertexRadius, 5);
         }
     }
 }
