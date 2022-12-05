@@ -46,7 +46,7 @@ function animate() {
                 if (!element.containsPoint(mouseX, mouseY)) {
                     c.strokeStyle = 'black';
                     // Set the line width relative to the size of vertices, wider than final edge size
-                    c.lineWidth = vertexRadius / 3;
+                    c.lineWidth = defaultVertexRadius / 3;
                     var edgeOfVertex = element.closestPointOnVertexToGivenPoint(mouseX, mouseY);
 
                     c.beginPath();
@@ -150,7 +150,7 @@ class Edge {
         }
 
         // Scales the width of the edge with the size of the vertices
-        c.lineWidth = vertexRadius / 4;
+        c.lineWidth = defaultVertexRadius / 4;
 
         var v1ClosePoint = this.vertex1.closestPointOnVertexToGivenPoint(this.vertex2.x, this.vertex2.y);
         var v2ClosePoint = this.vertex2.closestPointOnVertexToGivenPoint(this.vertex1.x, this.vertex1.y);
@@ -377,13 +377,19 @@ addEventListener('keyup', (e) => {
 })
 
 function resizeCanvas() {
+    xScalingFactor = (window.innerWidth - 100) / canvas.width;
+    yScalingFactor = window.innerHeight / canvas.height;
+
     canvas.width = window.innerWidth - 100;
     canvas.height = window.innerHeight;
     oldDefaultVertexRadius = defaultVertexRadius;
     defaultVertexRadius = canvas.width / 50;
+
     for (let i = 0; i < objects.length; i++) {
         if (objects[i] instanceof Vertex) {
             objects[i].radius = Math.max(objects[i].radius / oldDefaultVertexRadius * defaultVertexRadius, 5);
+            objects[i].x = Math.max(objects[i].x * xScalingFactor, 0);
+            objects[i].y = Math.max(objects[i].y * yScalingFactor, 0);
         }
     }
 }
