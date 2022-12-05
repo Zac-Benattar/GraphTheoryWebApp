@@ -383,7 +383,7 @@ function resizeCanvas() {
     canvas.width = window.innerWidth - 100;
     canvas.height = window.innerHeight;
     oldDefaultVertexRadius = defaultVertexRadius;
-    defaultVertexRadius = canvas.width / 50;
+    defaultVertexRadius = (canvas.width + canvas.height) / 100;
 
     for (let i = 0; i < objects.length; i++) {
         if (objects[i] instanceof Vertex) {
