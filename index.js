@@ -168,6 +168,7 @@ class Edge {
         c.stroke();
 
         if (enableWeights) {
+            c.fillStyle = 'green';
             c.font = '60px ui-sans-serif';
             c.fillText(this.weight, (this.vertex1.x + this.vertex2.x) / 2, (this.vertex1.y + this.vertex2.y) / 2);
         }
