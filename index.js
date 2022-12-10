@@ -43,7 +43,6 @@ function animate() {
     // Draws potential arcs (lines from all selected vertices)
     if (shiftHeld) {
         for (const element of selectedObjects) {
-            console.log(element.type);
             if (element.type == 'vertex') {
                 if (!element.containsPoint(mouseX, mouseY)) {
                     c.strokeStyle = 'black';
@@ -86,6 +85,8 @@ class Vertex {
         this.arcs = [];
     }
 
+    /* Gets the closest point to a given point that is on the vertex, usually the edge of the vertex, 
+    primarilly used when drawing arcs so that they do not draw above the vertex to its centre */
     closestPointOnVertexToGivenPoint(x, y) {
         var dx = x - this.x;
         var dy = y - this.y;
@@ -96,6 +97,7 @@ class Vertex {
         };
     }
 
+    // Gets whether the vertex contains a given point, used to determine if the vertext has been clicked
     containsPoint(x, y) {
         return (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y) < this.radius * this.radius;
     }
@@ -225,6 +227,7 @@ canvas.onmousedown = function (e) {
             isAlreadySelected = selectedObject.isSelected;
         }
 
+        // NULL and type check
         if (selectedObject != null && selectedObject.type == 'vertex') {
             // If shift is held when a vertex is clicked we must add an arc between it and all selected vertices
             if (shiftHeld) {
@@ -383,15 +386,22 @@ addEventListener('keyup', (e) => {
 
 })
 
+/* Performs a resize of all elements in the canvas. Used when the canvas changes size in order to ensure all objects
+    remain in the same location relative to each other object, by scaling the size of each and locations. */
 function resizeCanvas() {
+    // Calculate how much the window size has reduced by
     xScalingFactor = (window.innerWidth - 100) / canvas.width;
     yScalingFactor = window.innerHeight / canvas.height;
 
+    // Resize the canvas relative to the new window size
     canvas.width = window.innerWidth - 100;
     canvas.height = window.innerHeight;
+
+    // Calculate the new default vertex radius from the new canvas size
     oldDefaultVertexRadius = defaultVertexRadius;
     defaultVertexRadius = (canvas.width + canvas.height) / 100;
 
+    // Update the size of each vertex relative to its previous size and the new vertex radius
     for (let i = 0; i < objects.length; i++) {
         if (objects[i] instanceof Vertex) {
             objects[i].radius = Math.max(objects[i].radius / oldDefaultVertexRadius * defaultVertexRadius, 5);
@@ -401,6 +411,7 @@ function resizeCanvas() {
     }
 }
 
+// Handle the window resize event by calling the resize canvas function
 window.addEventListener('resize', (e) => {
     resizeCanvas();
 })

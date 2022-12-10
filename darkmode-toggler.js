@@ -4,7 +4,7 @@ const darkModeToggle = document.querySelector('#darkmode-toggle');
 // Get if dark mode is user defualt setting
 const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
 
-// Set darkmode if user colour scheme has it selected
+// Set darkmode and toggle if user colour scheme has it selected
 if (prefersDarkScheme.matches) {
   document.body.classList.toggle("dark-theme");
   darkModeToggle.checked = true;
