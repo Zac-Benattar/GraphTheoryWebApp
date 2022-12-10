@@ -10,7 +10,7 @@ if (prefersDarkScheme.matches) {
   darkModeToggle.checked = true;
 }
 
-// Listen for a click on the dark mode button
+// Listen for a click on the dark mode toggle
 darkModeToggle.addEventListener('click', function() {
     // Then toggle (add/remove) the .dark-theme class to the body
     document.body.classList.toggle('dark-theme');  
