@@ -32,6 +32,9 @@ let clickedObjectPadding = 5;
 // Visual adjustments, eventually user should be able to adjust
 let defaultVertexRadius = 20;
 
+// Limits and constants
+const MAX_WEIGHT = 9999;
+
 // Handles drawing frames, in an infinite loop
 function animate() {
     requestAnimationFrame(animate);
@@ -344,6 +347,19 @@ addEventListener('keydown', (e) => {
     // Ctrl is used for multi select
     else if (e.code == 'ControlLeft') {
         ctrlHeld = true;
+    }
+
+    if (selectedObjects.length == 1 && selectedObjects[0].type == 'edge') {
+        if (e.code == 'Backspace') {
+            selectedObjects[0].weight = 0;
+        } else {
+            var num = parseInt(e.key);
+            var newWeight = selectedObjects[0].weight * 10 + num;
+            if (!isNaN(num) && newWeight <= MAX_WEIGHT) {
+                selectedObjects[0].weight = newWeight;
+            }
+        }
+
     }
 
 })
