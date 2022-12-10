@@ -340,8 +340,8 @@ canvas.onmousemove = function (e) {
 }
 
 addEventListener('keydown', (e) => {
-    // Shift is used to draw edges from selected nodes
-    if (e.code == 'ShiftLeft') {
+    // Shift is used to draw edges from selected nodes and for alt keys
+    if (e.code == 'ShiftLeft' || e.code == 'ShiftRight') {
         shiftHeld = true;
     }
     // Ctrl is used for multi select
@@ -349,19 +349,37 @@ addEventListener('keydown', (e) => {
         ctrlHeld = true;
     }
 
-    if (selectedObjects.length == 1 && selectedObjects[0].type == 'edge') {
+    // When a single edge is selected read for numeric inputs to change the weighting
+    if (enableWeights && selectedObjects.length == 1 && selectedObjects[0].type == 'edge') {
+        // Backspace resets the weight to 0
         if (e.code == 'Backspace') {
             selectedObjects[0].weight = 0;
         } else {
+            // Convert the input ket to a number and get the previous weight
             var num = parseInt(e.key);
-            var newWeight = selectedObjects[0].weight * 10 + num;
-            if (!isNaN(num) && newWeight <= MAX_WEIGHT) {
-                selectedObjects[0].weight = newWeight;
+            var previousWeight = selectedObjects[0].weight;
+
+            // Check if the input was a number, if so append this number to the end of the weight if it will not exceed max val
+            if (!isNaN(num)) {
+                if (previousWeight >= 0) {
+                    var newWeight = previousWeight * 10 + num;
+                } else {
+                    var newWeight = previousWeight * 10 - num;
+                }
+                if (Math.abs(newWeight) <= MAX_WEIGHT) {
+                    selectedObjects[0].weight = newWeight;
+                }
+            }
+            // Minus sets the number to be negative
+            else if (e.code == 'Minus' && previousWeight > 0) {
+                selectedObjects[0].weight = -previousWeight;
+            }
+            // Plus sets the number to be positive, plus is an alt key so need to check for shift held
+            else if (e.code == 'Equal' && shiftHeld && previousWeight < 0) {
+                selectedObjects[0].weight = -previousWeight;
             }
         }
-
     }
-
 })
 
 addEventListener('keyup', (e) => {
