@@ -169,8 +169,11 @@ class Edge {
 
         if (enableWeights) {
             c.fillStyle = 'green';
-            c.font = '60px ui-sans-serif';
-            c.fillText(this.weight, (this.vertex1.x + this.vertex2.x) / 2, (this.vertex1.y + this.vertex2.y) / 2);
+            var fontSize = Math.max(2.2 * defaultVertexRadius, 15);
+            c.font = fontSize.toString() + 'px Arial';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillText(this.weight, (this.vertex1.x + this.vertex2.x) / 2, (this.vertex1.y + this.vertex2.y) / 2, 80);
         }
     }
 
