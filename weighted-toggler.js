@@ -1,4 +1,4 @@
-// Find toggle dark mode button
+// Find toggle weighted mode button
 const weightedModeToggle = document.querySelector('#weightedmode-toggle');
 
 // Set default value to toggle

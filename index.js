@@ -19,6 +19,7 @@ let ctrlHeld = false;
 let dragInAction = false;
 let enableWeights = true;
 let directedEdges = false;
+let enableForces = true;
 
 // Location variables for mouse related properties
 let mouseX = 0;
