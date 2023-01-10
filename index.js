@@ -139,7 +139,7 @@ class Edge {
         this.weight = 0;
     }
 
-    // Returns if given coords are on the line (with padding)
+    // Returns if given coords are on the line (with padding), used for selecting the arc
     containsPoint(x, y) {
         var dx = this.vertex1.x - this.vertex2.x;
         var dy = this.vertex1.y - this.vertex2.y;
@@ -149,8 +149,8 @@ class Edge {
         return (percent < 0 && percent > -1 && Math.abs(distance) < clickedObjectPadding);
     }
 
+    /* Draws a line between the parents of the arc */
     draw() {
-        /* Draws a line between the parents of the arc */
         if (!this.isSelected) {
             c.strokeStyle = this.colour;
         }
@@ -161,14 +161,17 @@ class Edge {
         // Scales the width of the edge with the size of the vertices
         c.lineWidth = defaultVertexRadius / 4;
 
+        // Get closest point on each vertex from the other
         var v1ClosePoint = this.vertex1.closestPointOnVertexToGivenPoint(this.vertex2.x, this.vertex2.y);
         var v2ClosePoint = this.vertex2.closestPointOnVertexToGivenPoint(this.vertex1.x, this.vertex1.y);
 
+        // Draw the arc
         c.beginPath();
         c.moveTo(v1ClosePoint.x, v1ClosePoint.y);
         c.lineTo(v2ClosePoint.x, v2ClosePoint.y);
         c.stroke();
 
+        // Draw the weight if the weight toggle is enabled
         if (enableWeights) {
             c.fillStyle = 'green';
             c.font = parseInt(textSizeInPt).toString() + 'pt ui-sans-serif';
@@ -204,7 +207,7 @@ function getMousePos(e) {
     };
 }
 
-// Double click event creates a vertex
+// Double click event in empty space creates a vertex
 canvas.ondblclick = function (e) {
     var mousePos = getMousePos(e);
     selectedObject = selectObject(mousePos.x, mousePos.y);
@@ -279,8 +282,6 @@ canvas.onmousedown = function (e) {
                 selectedObjects.push(selectedObject);
             }
         }
-
-
     }
 }
 
@@ -423,8 +424,9 @@ addEventListener('keyup', (e) => {
 
 })
 
-/* Performs a resize of all elements in the canvas. Used when the canvas changes size in order to ensure all objects
-    remain in the same location relative to each other object, by scaling the size of each and locations. */
+/* Performs a resize of all elements in the canvas. Used when the canvas changes size in order to 
+    ensure all objects remain in the same location relative to each other object, 
+    by scaling the size of each and locations. */
 function resizeCanvas() {
     // Calculate how much the window size has reduced by
     xScalingFactor = (window.innerWidth - 100) / canvas.width;
