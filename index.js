@@ -31,7 +31,6 @@ let clickedObjectPadding = 5;
 
 // Visual adjustments, eventually user should be able to adjust
 let defaultVertexRadius = 20;
-let textSizeInPt = 35;
 
 // Limits and constants
 const MAX_WEIGHT = 9999;
@@ -174,7 +173,7 @@ class Edge {
         // Draw the weight if the weight toggle is enabled
         if (enableWeights) {
             c.fillStyle = 'green';
-            var fontSize = Math.max(2.2 * defaultVertexRadius, 15);
+            var fontSize = Math.min(Math.max(2.2 * defaultVertexRadius, 15), MAX_TEXT_SIZE_IN_PT);
             c.font = fontSize.toString() + 'px Arial';
             c.textAlign = 'center';
             c.textBaseline = 'middle';
@@ -451,9 +450,6 @@ function resizeCanvas() {
             objects[i].y = Math.max(objects[i].y * yScalingFactor, 0);
         }
     }
-
-    // Update the size of text 
-    textSizeInPt = Math.min(Math.max(textSizeInPt / oldDefaultVertexRadius * defaultVertexRadius, 5), MAX_TEXT_SIZE_IN_PT);
 }
 
 // Handle the window resize event by calling the resize canvas function
