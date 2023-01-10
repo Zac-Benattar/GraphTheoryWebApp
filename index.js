@@ -37,6 +37,9 @@ let defaultVertexRadius = 20;
 const MAX_WEIGHT = 9999;
 const MAX_TEXT_SIZE_IN_PT = 40;
 
+// Creating a variable for our worker for background processes
+let worker = undefined;
+
 // Handles drawing frames, in an infinite loop
 function animate() {
     requestAnimationFrame(animate);
@@ -208,6 +211,34 @@ function getMousePos(e) {
         x: (e.clientX - rect.left) * scaleX,
         y: (e.clientY - rect.top) * scaleY
     };
+}
+
+// Begins the worker process
+function startWorker() {
+    if (typeof (Worker) !== "undefined") {
+        // Creates and starts the worker
+        if (typeof (worker) == "undefined") {
+            worker = new Worker("arrangement-force-worker.js");
+            worker.postMessage(objects);
+        }
+        // Handling data from worker, immediately sends current state of objects back to the worker
+        // MEMORY LEAK AT THE MOMENT - NEED TO DISPOSE OF PREVIOUS MESSAGE WHEN GETTING A NEW ONE
+        // Possibly use a faster transfer method, shared arrays seem to be quick
+        worker.onmessage = function (event) {
+            console.log(event.data);
+            worker.postMessage(objects);
+        };
+    } else {
+        //document.getElementById("errorBox").innerHTML = "Sorry, your browser does not support Web Workers so force arrangement is not supported";
+    }
+}
+
+// Stops the worker process
+function stopWorker() {
+    if (typeof (Worker) !== "undefined") {
+        worker.terminate();
+        worker = undefined;
+    }
 }
 
 // Double click event in empty space creates a vertex
