@@ -40,8 +40,11 @@ const MAX_TEXT_SIZE_IN_PT = 40;
 // Creating a variable for our worker for background processes
 let worker = undefined;
 
-// Handles drawing frames, in an infinite loop
+// Handles drawing frames, in an infinite loop, perhaps use a webworker here
+// Could put the forces worker in here?
 function animate() {
+
+
     requestAnimationFrame(animate);
     c.clearRect(0, 0, canvas.width, canvas.height);
     objects.forEach((object) => {
@@ -222,11 +225,10 @@ function startWorker() {
             worker.postMessage(objects);
         }
         // Handling data from worker, immediately sends current state of objects back to the worker
-        // MEMORY LEAK AT THE MOMENT - NEED TO DISPOSE OF PREVIOUS MESSAGE WHEN GETTING A NEW ONE
         // Possibly use a faster transfer method, shared arrays seem to be quick
+        // Whenever data is changed on this 
         worker.onmessage = function (event) {
             console.log(event.data);
-            worker.postMessage(objects);
         };
     } else {
         //document.getElementById("errorBox").innerHTML = "Sorry, your browser does not support Web Workers so force arrangement is not supported";
